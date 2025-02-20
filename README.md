@@ -6,7 +6,7 @@
 
 # GitHub Lines of Code Counter (LocCounter)
 
-LocCounter is a Python-based tool that calculates the total Lines of Code (LOC) across all your GitHub repositories. It can be run automatically via GitHub Actions to update your repository's readme.md with a real-time LOC badge. The script supports file exclusions, folder-specific counting, professional contributions estimation and encrypted tracking of repository LOC changes.
+LocCounter is a Python-based tool that calculates the total Lines of Code (LOC) across all your GitHub repositories. It can be run automatically via GitHub Actions to update your repository's readme.md with a real-time LOC badge (As show at the top of this readme.md file). The script supports file exclusions, folder-specific counting, professional contributions estimation and encrypted tracking of repository LOC changes.
 
 ## Features
 
@@ -60,7 +60,7 @@ Exclude .js Files in frontend_project, Include Only src/ in backend_project
 
 To run this script automatically every night at 11:00 PM, create a .github/workflows/loc_workflow.yml file:
 
-**Coming Soon**
+*Coming Soon*
 
 ## Installation (Locally)
 
