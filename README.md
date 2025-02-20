@@ -79,25 +79,25 @@ To run this script automatically every night at 11:00 PM, create a .github/workf
 
 ## Installation (Locally)
 
-### Prerequisites
+**Prerequisites**
 
 - Python 3.8+
 - All mandatory requirements values
 
-### Clone the Repository
+**Clone the Repository**
 
 ```sh
 git clone https://github.com/your-username/LocCounter.git
 cd LocCounter
 ```
 
-### Install Dependencies
+**Install Dependencies**
 
 ```sh
 pip install -r requirements.txt
 ```
 
-## Usage
+**Usage**
 
 The script can be run from command line using this command.
 
