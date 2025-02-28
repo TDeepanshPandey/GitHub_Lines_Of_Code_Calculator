@@ -1,0 +1,60 @@
+name: Update Lines of Code
+
+on:
+  schedule:
+    - cron: "0 23 * * 0"  # Runs every day at 11:00 PM UTC
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+
+jobs:
+  count-loc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Cache Python Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run LocCounter
+        env:
+          GITHUB_USERNAME: ${{ secrets.USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          SECRET_PASS: ${{ secrets.PASSPHRASE }}
+        run: |
+          python loc_counter.py \
+            --github_username "$GITHUB_USERNAME" \
+            --github_token "$GITHUB_TOKEN" \
+            --file_extensions ".py,.js,.ts,.java,.cpp,.css,.html,.ipynb,.jsp,.sql,.yaml,.scala,.php,.R" \
+            --exclude_repos "github-readme-streak-stats,Deep-Learning-2019,Procedural_Modeling_Program,Invoice_Generation" \
+            --section_tag "locTag" \
+            --secret_passphrase "$SECRET_PASS" \
+            --display_title "From Hello World till today, I have written" \
+            --excluded_file_extensions_per_repo "{\"Automatic_Email_Classifier_Supervised_Learning\": [\".html\", \".js\"], \"Bank_Application\": [\".jsp\"], \"startyourmasters\": [\".css\"], \"deepanshpandeywebsite\": [\".css\"], \"docker_kubernetes\": [\".js\"]}" \
+            --included_folders_per_repo "{\"Hospital_and_Disease_Android_Application\": [\"src\"]}" \
+            --professional_contrib \
+            --loc_per_day "100" \
+            --work_experience "4" 
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git pull --rebase
+          git add readme.md repo_tracker.json
+          git diff --quiet && echo "No changes to commit" || git commit -m "Updated Lines of Code Count"
+          git push
