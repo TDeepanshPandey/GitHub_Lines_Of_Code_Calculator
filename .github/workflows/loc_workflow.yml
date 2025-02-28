@@ -55,6 +55,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
           git pull --rebase
-          git add readme.md repo_tracker.json
-          git diff --quiet && echo "No changes to commit" || git commit -m "Updated Lines of Code Count"
-          git push
+          cd $GITHUB_WORKSPACE  # Move to the repo root
+          git add README.md repo_tracker.json || echo "No files to add"
+          git diff --exit-code || git commit -m "Updated Lines of Code Count"
+          git push || echo "No changes to push"
