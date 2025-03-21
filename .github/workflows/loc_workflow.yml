@@ -5,6 +5,9 @@ on:
     - cron: "0 23 * * 0"  # Runs every day at 11:00 PM UTC
   workflow_dispatch:  # Allows manual triggering from GitHub UI
 
+permissions:
+    contents: write
+    
 jobs:
   count-loc:
     runs-on: ubuntu-latest
