@@ -14,7 +14,7 @@ class LocCounter:
         self.github_username = args.github_username
         self.github_token = args.github_token
         self.repo_dir = args.repo_dir
-        self.readme_path = args.readme_path
+        self.readme_path = os.path.abspath(args.readme_path)  # Ensure absolute path
         self.file_extensions = tuple(args.file_extensions.split(','))
         self.exclude_forked_repos = args.exclude_forked_repos.lower() == 'true'
         self.exclude_repos = set(args.exclude_repos.split(',')) if args.exclude_repos else set()
@@ -181,20 +181,22 @@ class LocCounter:
 
 
     def update_readme(self, total_loc):
-            if not os.path.exists(self.readme_path):
-                return
-            with open(self.readme_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            new_content = re.sub(
-                f'<!--START_SECTION:{self.section_tag}-->.*?<!--END_SECTION:{self.section_tag}-->',
-                f'<!--START_SECTION:{self.section_tag}-->\n\n'
-                f'![{self.display_title}](https://img.shields.io/badge/{self.display_title}-{total_loc}-blue)\n\n'
-                f'<!--END_SECTION:{self.section_tag}-->',
-                content, flags=re.DOTALL
-            )
-            with open(self.readme_path, "w", encoding="utf-8") as f:
-                f.write(new_content)
-            print(f"Updated README.md with total LOC: {total_loc}")  # Debug print
+        print(f"Updating README.md at path: {self.readme_path}")  # Debug print
+        if not os.path.exists(self.readme_path):
+            print(f"README.md not found at path: {self.readme_path}")  # Debug print
+            return
+        with open(self.readme_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        new_content = re.sub(
+            f'<!--START_SECTION:{self.section_tag}-->.*?<!--END_SECTION:{self.section_tag}-->',
+            f'<!--START_SECTION:{self.section_tag}-->\n\n'
+            f'![{self.display_title}](https://img.shields.io/badge/{self.display_title}-{total_loc}-blue)\n\n'
+            f'<!--END_SECTION:{self.section_tag}-->',
+            content, flags=re.DOTALL
+        )
+        with open(self.readme_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        print(f"Updated README.md with total LOC: {total_loc}")  # Debug print
                 
     def run(self):
         repos = self.get_repositories()
