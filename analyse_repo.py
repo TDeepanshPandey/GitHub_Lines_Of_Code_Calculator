@@ -23,16 +23,17 @@ def analyze_repository(repo_path):
     # Print analysis results
     print("\nRepository Analysis")
     print("=" * 40)
-    for ext, count in sorted(file_counts.items(), key=lambda x: -x[1]):
+    for ext, count in sorted(file_counts.items(), key=lambda x: x[1], reverse=True):
         print(f"{ext}: {count} files, {line_counts.get(ext, 0)} lines")
 
     print("=" * 40)
     print(f"Total Files: {sum(file_counts.values())}")
     print(f"Total Lines: {sum(line_counts.values())}")
 
-# Run the script
-repo_path = input("Enter the path to the repository: ").strip()
-if os.path.exists(repo_path):
-    analyze_repository(repo_path)
-else:
-    print("Invalid repository path")
+if __name__ == "__main__":
+    # Run the script
+    repo_path = input("Enter the path to the repository: ").strip()
+    if os.path.exists(repo_path):
+        analyze_repository(repo_path)
+    else:
+        print("Invalid repository path")

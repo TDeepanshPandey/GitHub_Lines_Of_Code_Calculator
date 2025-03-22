@@ -4,9 +4,9 @@
 
 <!--END_SECTION:locTag-->
 
-# GitHub Lines of Code Counter (LocCounter)
+# GitHub Lines of Code Counter (LOCounter)
 
-LocCounter is a Python-based tool that calculates the total Lines of Code (LOC) across all your GitHub repositories. It can be run automatically via GitHub Actions to update your repository's README.md with a real-time LOC badge (As show at the top of this README.md file). The script supports file exclusions, folder-specific counting, professional contributions estimation and encrypted tracking of repository LOC changes.
+**LocCounter** is a Python-based tool that calculates the total Lines of Code (LOC) across all your GitHub repositories. It can be run automatically via GitHub Actions to update your repository's README.md with a real-time LOC badge (As shown at the top of this README.md file). The script supports file exclusions, folder-specific counting, professional contributions estimation, and encrypted tracking of repository LOC changes.
 
 ## Features
 
@@ -24,9 +24,10 @@ LocCounter is a Python-based tool that calculates the total Lines of Code (LOC) 
 |----------|----------|---------|-------------|
 | `--github_username` | ✅ | None | Your GitHub username. |
 | `--github_token` | ✅ | None | GitHub **Personal Access Token (PAT)** for authentication. |
+| `--repo_name` | ✅ | None | The name of the GitHub repository. |
 | `--section_tag` | ✅ | None | The tag in `README.md` where the LOC badge will be placed. |
 | `--secret_passphrase` | ✅ | None | Passphrase for encrypting and decrypting LOC tracking data. |
-| `--repo_dir` | ❌ | `repos` | Directory to clone repositories. |
+| `--repo_dir` | ❌ | `repos` | **Directory** to clone repositories. |
 | `--readme_path` | ❌ | `README.md` | Path to the `README.md` file to update. |
 | `--track_file` | ❌ | `repo_tracker.json` | File to store encrypted LOC tracking data. |
 | `--file_extensions` | ❌ | `.py,.js,.ts,.java,.cpp,.md` | Comma-separated list of file extensions to include in LOC count. |
@@ -37,6 +38,7 @@ LocCounter is a Python-based tool that calculates the total Lines of Code (LOC) 
 | `--display_title` | ❌ | `"Lines of Code"` | Title displayed in the LOC badge (e.g., `"Total LOC"`). |
 | `--record_file_extensions` | ❌ | `false` | Enable tracking of unique file extensions found in repositories. |
 | `--debug_tracker` | ❌ | `true` | Save an unencrypted `repo_tracker.json` for debugging (true/false). |
+| `--enable_tracking` | ❌ | `false` | Enable tracking of repository data (true/false). |
 | `--professional_contrib` | ❌ | `false` | Include estimated professional contributions in the LOC count. |
 | `--loc_per_day` | ❌ | `100` | Estimated number of lines of code written per workday. |
 | `--work_experience` | ❌ | `1` | Number of years of professional experience. |
@@ -73,16 +75,13 @@ The section_tag is a placeholder in your README.md file that tells the script wh
 
 ## Automate with GitHub Actions
 
-To run this script automatically every night at 11:00 PM, create a .github/workflows/loc_workflow.yml file:
-
-*Coming Soon*
-
+To run this script automatically every night at 11:00 PM, create a .github/workflows/loc_workflow.yml file. Check the attached file for parameters.
 ## Installation (Locally)
 
 **Prerequisites**
 
 - Python 3.8+
-- All mandatory requirements values
+- All mandatory requirements in `requirements.txt`
 
 **Clone the Repository**
 
@@ -103,7 +102,7 @@ The script can be run from command line using this command.
 
 ```python
 python loc_counter.py --github_username YOUR_USERNAME --github_token YOUR_GITHUB_PAT \
-    --repo_dir repos --readme_path README.md --section_tag LOC \
+    --repo_name YOUR_REPO_NAME --section_tag LOC \
     --secret_passphrase "your-secret-pass" --debug_tracker true
 ```
 
