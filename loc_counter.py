@@ -175,12 +175,12 @@ class LocCounter:
                 elif file_ext in self.file_extensions:
                     with open(file_path, "r", errors="ignore") as f:
                         total_lines += sum(1 for _ in f)
-
         return total_lines
 
 
 
     def update_readme(self, total_loc):
+        print(f"Current working directory: {os.getcwd()}")  # Debug print
         print(f"Updating README.md at path: {self.readme_path}")  # Debug print
         if not os.path.exists(self.readme_path):
             print(f"README.md not found at path: {self.readme_path}")  # Debug print
