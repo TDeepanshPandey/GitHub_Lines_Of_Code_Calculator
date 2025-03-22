@@ -184,7 +184,12 @@ class LocCounter:
         print(f"Updating README.md at path: {self.readme_path}")  # Debug print
         if not os.path.exists(self.readme_path):
             print(f"README.md not found at path: {self.readme_path}")  # Debug print
-            return
+            # Try adjusting the path
+            self.readme_path = os.path.join(os.getcwd(), "README.md")
+            print(f"Trying adjusted path: {self.readme_path}")  # Debug print
+            if not os.path.exists(self.readme_path):
+                print(f"README.md still not found at path: {self.readme_path}")  # Debug print
+                return
         with open(self.readme_path, "r", encoding="utf-8") as f:
             content = f.read()
         new_content = re.sub(
