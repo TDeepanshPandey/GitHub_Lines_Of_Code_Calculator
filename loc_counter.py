@@ -204,7 +204,7 @@ class LocCounter:
         }
         response = requests.put(url, headers=headers, data=json.dumps(data))
         if response.status_code == 200:
-            print(f"Successfully updated")
+            print(f"Successfully updated {path}")
         else:
             print(f"Failed to update: {response.json()}")
 
