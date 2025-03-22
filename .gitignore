@@ -1,3 +1,4 @@
 .pytest*
 repos
 .vscode
+repo_tracker_debug.json
