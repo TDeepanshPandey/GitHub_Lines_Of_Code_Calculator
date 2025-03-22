@@ -194,6 +194,7 @@ class LocCounter:
             )
             with open(self.readme_path, "w", encoding="utf-8") as f:
                 f.write(new_content)
+            print(f"Updated README.md with total LOC: {total_loc}")  # Debug print
                 
     def run(self):
         repos = self.get_repositories()
