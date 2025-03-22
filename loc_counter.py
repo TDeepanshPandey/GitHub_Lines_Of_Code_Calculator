@@ -76,8 +76,12 @@ class LocCounter:
         """Loads repo tracker from debug file if debug mode is enabled, otherwise decrypts and loads the encrypted file."""
         path = "repo_tracker_debug.json" if self.debug_tracker else self.track_file
         if os.path.exists(path):
-            with open(path, "rb" if not self.debug_tracker else "r", encoding="utf-8") as f:
-                return json.load(f) if self.debug_tracker else json.loads(self.decrypt(f.read()))
+            if self.debug_tracker:
+                with open(path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            else:
+                with open(path, "rb") as f:
+                    return json.loads(self.decrypt(f.read()))
         return {}
 
     
@@ -238,7 +242,7 @@ if __name__ == "__main__":
 
     # Debugging and tracking
     parser.add_argument("--record_file_extensions", default=False, action="store_true", help="Enable tracking of unique file extensions found in repositories.")
-    parser.add_argument("--debug_tracker", default=False, help="Save an unencrypted repo_tracker.json for debugging (true/false).")
+    parser.add_argument("--debug_tracker", default=False, action="store_true", help="Save an unencrypted repo_tracker.json for debugging (true/false).")
 
     # Professional contribution estimation
     parser.add_argument("--professional_contrib", action="store_true", help="Include estimated professional contributions in the LOC count.")
