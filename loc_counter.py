@@ -14,7 +14,7 @@ class LocCounter:
         self.github_username = args.github_username
         self.github_token = args.github_token
         self.repo_dir = args.repo_dir
-        self.readme_path = os.path.abspath(args.readme_path)  # Ensure absolute path
+        self.readme_path = args.readme_path
         self.file_extensions = tuple(args.file_extensions.split(','))
         self.exclude_forked_repos = args.exclude_forked_repos.lower() == 'true'
         self.exclude_repos = set(args.exclude_repos.split(',')) if args.exclude_repos else set()
@@ -32,6 +32,7 @@ class LocCounter:
         self.loc_per_day = args.loc_per_day
         self.work_experience = args.work_experience
         self.professional_contrib = args.professional_contrib
+        self.repo_name = args.repo_name
 
     def encrypt(self, data):
         """ Encrypts data using AES """
@@ -95,6 +96,7 @@ class LocCounter:
             with open(debug_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
             print(f"Debug mode enabled: Saved unencrypted repo tracker to {debug_path}")
+        self.update_file(self.track_file, encrypted_data, "Updated repo tracker")
 
     def get_latest_commit(self, repo_name):
         url = f"https://api.github.com/repos/{self.github_username}/{repo_name}/commits"
@@ -175,34 +177,59 @@ class LocCounter:
                 elif file_ext in self.file_extensions:
                     with open(file_path, "r", errors="ignore") as f:
                         total_lines += sum(1 for _ in f)
+
         return total_lines
 
+    def get_file_sha(self, path):
+        url = f"https://api.github.com/repos/{self.github_username}/{self.repo_name}/contents/{path}"
+        headers = {"Authorization": f"token {self.github_token}"}
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json().get("sha")
+        return None
 
+    def update_file(self, path, content, message):
+        url = f"https://api.github.com/repos/{self.github_username}/{self.repo_name}/contents/{path}"
+        headers = {
+            "Authorization": f"token {self.github_token}",
+            "Content-Type": "application/json"
+        }
+        sha = self.get_file_sha(path)
+        data = {
+            "message": message,
+            "content": base64.b64encode(content.encode()).decode(),
+            "sha": sha,
+            "branch": "main"
+        }
+        response = requests.put(url, headers=headers, data=json.dumps(data))
+        if response.status_code == 200:
+            print(f"Successfully updated")
+        else:
+            print(f"Failed to update: {response.json()}")
 
     def update_readme(self, total_loc):
-        if os.path.exists(self.readme_path):
-            with open(self.readme_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            new_content = re.sub(
-                f'<!--START_SECTION:{self.section_tag}-->.*?<!--END_SECTION:{self.section_tag}-->',
-                f'<!--START_SECTION:{self.section_tag}-->\n\n'
-                f'![{self.display_title}](https://img.shields.io/badge/{self.display_title}-{total_loc}-blue)\n\n'
-                f'<!--END_SECTION:{self.section_tag}-->',
-                content, flags=re.DOTALL
-            )
-            with open(self.readme_path, "w", encoding="utf-8") as f:
-                f.write(new_content)
-            print(f"Updated README.md with total LOC: {total_loc}")  # Debug print
-        else:
-            print(f"README.md not found at {self.readme_path}. Skipping update.")
-            return None
+        if not os.path.exists(self.readme_path):
+            return
+        with open(self.readme_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        new_content = re.sub(
+            f'<!--START_SECTION:{self.section_tag}-->.*?<!--END_SECTION:{self.section_tag}-->',
+            f'<!--START_SECTION:{self.section_tag}-->\n\n'
+            f'![{self.display_title}](https://img.shields.io/badge/{self.display_title}-{total_loc}-blue)\n\n'
+            f'<!--END_SECTION:{self.section_tag}-->',
+            content, flags=re.DOTALL
+        )
+        with open(self.readme_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        self.update_file(self.readme_path, new_content, "Updated Lines of Code Count")
                 
     def run(self):
         repos = self.get_repositories()
         repo_tracker = self.load_repo_tracker()
         updated_repos = self.clone_repositories(repos, repo_tracker)
         total_loc = sum(repo_tracker[repo]["lines"] for repo in repo_tracker if "lines" in repo_tracker[repo])
-            # Add professional contribution if enabled
+        
+        # Add professional contribution if enabled
         if self.professional_contrib:
             work_days = self.work_experience * 261  # Approximate total work days
             professional_loc = self.loc_per_day * work_days
@@ -227,12 +254,13 @@ if __name__ == "__main__":
     # Required arguments
     parser.add_argument("--github_username", required=True, help="Your GitHub username.")
     parser.add_argument("--github_token", required=True, help="GitHub Personal Access Token (PAT) for authentication.")
+    parser.add_argument("--repo_name", required=True, help="The name of the GitHub repository.")
     parser.add_argument("--section_tag", required=True,  help="The tag to identify the section in README where the LOC badge is placed.")
     parser.add_argument("--secret_passphrase", required=True, help="Secret passphrase used for encrypting and decrypting repository tracking data.")
 
     # Repository and file settings
     parser.add_argument("--repo_dir", default="repos", help="Local directory where repositories will be cloned.")
-    parser.add_argument("--readme_path", default="README.md", help="Path to the README file where the LOC badge will be updated.")
+    parser.add_argument("--readme_path", default="readme.md", help="Path to the README file where the LOC badge will be updated.")
     parser.add_argument("--track_file", default="repo_tracker.json", help="Filename to store encrypted repository tracking data.")
     parser.add_argument("--file_extensions", default=".py,.js,.ts,.java,.cpp,.md", help="Comma-separated list of file extensions to include in LOC calculations.")
     parser.add_argument("--exclude_forked_repos", default="true", help="Exclude forked repositories from LOC calculations (true/false).")
