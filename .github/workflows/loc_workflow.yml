@@ -11,15 +11,17 @@ permissions:
 jobs:
   count-loc:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        continue-on-error: false
 
       - name: Set Up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
+        continue-on-error: false
 
       - name: Cache Python Dependencies
         uses: actions/cache@v3
@@ -28,10 +30,12 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+        continue-on-error: false
 
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+        continue-on-error: false
 
       - name: Run LocCounter
         env:
@@ -52,6 +56,7 @@ jobs:
             --professional_contrib \
             --loc_per_day "100" \
             --work_experience "4" 
+        continue-on-error: false
 
       - name: Commit and Push Changes
         run: |
@@ -62,3 +67,4 @@ jobs:
           git add README.md repo_tracker.json || echo "No files to add"
           git diff --exit-code || git commit -m "Updated Lines of Code Count"
           git push || echo "No changes to push"
+        continue-on-error: false
