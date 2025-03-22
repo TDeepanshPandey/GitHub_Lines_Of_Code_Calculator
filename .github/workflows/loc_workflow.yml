@@ -75,7 +75,7 @@ jobs:
           git pull --rebase
           cd $GITHUB_WORKSPACE  # Move to the repo root
           git stash pop || echo "No stash to apply"
-          git add README.md repo_tracker.json || echo "No files to add"
+          git add README.md .secure_data/repo_tracker.json || echo "No files to add"
           git diff --exit-code || git commit -m "Updated Lines of Code Count"
           git push || echo "No changes to push"
         continue-on-error: false
