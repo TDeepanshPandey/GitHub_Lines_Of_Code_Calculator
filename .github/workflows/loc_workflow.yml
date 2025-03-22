@@ -37,11 +37,6 @@ jobs:
           pip install -r requirements.txt
         continue-on-error: false
 
-      - name: Ensure Secure Data Folder Exists
-        run: |
-          mkdir -p .secure_data
-        continue-on-error: false
-
       - name: Run LocCounter
         env:
           GITHUB_USERNAME: ${{ secrets.USERNAME }}
@@ -51,6 +46,7 @@ jobs:
           python loc_counter.py \
             --github_username "$GITHUB_USERNAME" \
             --github_token "$GITHUB_TOKEN" \
+            --repo_name "GITHUB_LINES_OF_CODE_CALCULATOR" \
             --file_extensions ".py,.js,.ts,.java,.cpp,.css,.html,.ipynb,.jsp,.sql,.yaml,.scala,.php,.R" \
             --exclude_repos "github-readme-streak-stats,Deep-Learning-2019,Procedural_Modeling_Program,Invoice_Generation,humanoid_part_detection" \
             --section_tag "locTag" \
@@ -60,23 +56,5 @@ jobs:
             --included_folders_per_repo "{\"Hospital_and_Disease_Android_Application\": [\"src\"]}" \
             --professional_contrib \
             --loc_per_day "100" \
-            --work_experience "4" 
-        continue-on-error: false
-
-      - name: Stash Unstaged Changes
-        run: |
-          git stash --include-untracked
-        continue-on-error: false
-
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions@github.com"
-          git pull --rebase
-          cd $GITHUB_WORKSPACE  # Move to the repo root
-          git stash pop || echo "No changes to apply"
-          git add README.md 
-          git add .secure_data/repo_tracker.json
-          git diff --exit-code || git commit -m "Updated Lines of Code Count"
-          git push || echo "No changes to push"
+            --work_experience "4" \
         continue-on-error: false
