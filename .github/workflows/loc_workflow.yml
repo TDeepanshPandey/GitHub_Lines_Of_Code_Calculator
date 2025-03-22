@@ -57,4 +57,5 @@ jobs:
             --professional_contrib \
             --loc_per_day "100" \
             --work_experience "4" \
+            --enable_tracking \
         continue-on-error: false

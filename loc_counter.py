@@ -21,9 +21,7 @@ class LocCounter:
         self.record_file_extensions = args.record_file_extensions
         self.all_file_extensions = set()
         self.section_tag = args.section_tag
-        self.secure_dir = ".secure_data"
-        os.makedirs(self.secure_dir, exist_ok=True)
-        self.track_file = os.path.join(self.secure_dir, args.track_file)
+        self.track_file = args.track_file
         self.SECRET_KEY = args.secret_passphrase
         self.debug_tracker = args.debug_tracker
         self.excluded_file_extensions_per_repo = args.excluded_file_extensions_per_repo
@@ -33,6 +31,7 @@ class LocCounter:
         self.work_experience = args.work_experience
         self.professional_contrib = args.professional_contrib
         self.repo_name = args.repo_name
+        self.enable_tracking = args.enable_tracking  # Add this line
 
     def encrypt(self, data):
         """ Encrypts data using AES """
@@ -75,6 +74,8 @@ class LocCounter:
 
     def load_repo_tracker(self):
         """Loads repo tracker from debug file if debug mode is enabled, otherwise decrypts and loads the encrypted file."""
+        if not self.enable_tracking:  # Add this condition
+            return {}
         path = "repo_tracker_debug.json" if self.debug_tracker else self.track_file
         if os.path.exists(path):
             if self.debug_tracker:
@@ -88,9 +89,9 @@ class LocCounter:
     
     def save_repo_tracker(self, data):
         """ Encrypts and saves the repo tracker securely """
+        if not self.enable_tracking:  # Add this condition
+            return
         encrypted_data = self.encrypt(json.dumps(data))
-        with open(self.track_file, "wb") as f:
-            f.write(encrypted_data.encode())
         if self.debug_tracker:
             debug_path = os.path.join("repo_tracker_debug.json")
             with open(debug_path, "w", encoding="utf-8") as f:
@@ -219,15 +220,13 @@ class LocCounter:
             f'<!--END_SECTION:{self.section_tag}-->',
             content, flags=re.DOTALL
         )
-        with open(self.readme_path, "w", encoding="utf-8") as f:
-            f.write(new_content)
         self.update_file(self.readme_path, new_content, "Updated Lines of Code Count")
                 
     def run(self):
         repos = self.get_repositories()
-        repo_tracker = self.load_repo_tracker()
+        repo_tracker = self.load_repo_tracker() if self.enable_tracking else {}  # Modify this line
         updated_repos = self.clone_repositories(repos, repo_tracker)
-        total_loc = sum(repo_tracker[repo]["lines"] for repo in repo_tracker if "lines" in repo_tracker[repo])
+        total_loc = sum(repo_tracker[repo]["lines"] for repo in repo_tracker if "lines" in repo_tracker) if self.enable_tracking else 0  # Modify this line
         
         # Add professional contribution if enabled
         if self.professional_contrib:
@@ -243,8 +242,9 @@ class LocCounter:
         
         if self.record_file_extensions:
             print(f"All Unique File Extension in your Github: {self.all_file_extensions}")
-        repo_tracker.update(updated_repos)
-        self.save_repo_tracker(repo_tracker)
+        if self.enable_tracking:  # Add this condition
+            repo_tracker.update(updated_repos)
+            self.save_repo_tracker(repo_tracker)
         self.update_readme(total_loc)
         print(f"Total Lines of Code Across All Repositories: {total_loc}")
 
@@ -260,7 +260,7 @@ if __name__ == "__main__":
 
     # Repository and file settings
     parser.add_argument("--repo_dir", default="repos", help="Local directory where repositories will be cloned.")
-    parser.add_argument("--readme_path", default="readme.md", help="Path to the README file where the LOC badge will be updated.")
+    parser.add_argument("--readme_path", default="README.md", help="Path to the README file where the LOC badge will be updated.")
     parser.add_argument("--track_file", default="repo_tracker.json", help="Filename to store encrypted repository tracking data.")
     parser.add_argument("--file_extensions", default=".py,.js,.ts,.java,.cpp,.md", help="Comma-separated list of file extensions to include in LOC calculations.")
     parser.add_argument("--exclude_forked_repos", default="true", help="Exclude forked repositories from LOC calculations (true/false).")
@@ -274,6 +274,7 @@ if __name__ == "__main__":
     # Debugging and tracking
     parser.add_argument("--record_file_extensions", default=False, action="store_true", help="Enable tracking of unique file extensions found in repositories.")
     parser.add_argument("--debug_tracker", default=False, action="store_true", help="Save an unencrypted repo_tracker.json for debugging (true/false).")
+    parser.add_argument("--enable_tracking", default=False, action="store_true", help="Enable tracking of repository data (true/false).")  # Add this line
 
     # Professional contribution estimation
     parser.add_argument("--professional_contrib", action="store_true", help="Include estimated professional contributions in the LOC count.")
