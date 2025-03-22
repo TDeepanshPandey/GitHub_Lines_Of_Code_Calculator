@@ -52,7 +52,7 @@ jobs:
             --github_username "$GITHUB_USERNAME" \
             --github_token "$GITHUB_TOKEN" \
             --file_extensions ".py,.js,.ts,.java,.cpp,.css,.html,.ipynb,.jsp,.sql,.yaml,.scala,.php,.R" \
-            --exclude_repos "github-readme-streak-stats,Deep-Learning-2019,Procedural_Modeling_Program,Invoice_Generation" \
+            --exclude_repos "github-readme-streak-stats,Deep-Learning-2019,Procedural_Modeling_Program,Invoice_Generation,humanoid_part_detection" \
             --section_tag "locTag" \
             --secret_passphrase "$SECRET_PASS" \
             --display_title "From Hello World till today, I have written" \

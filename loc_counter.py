@@ -97,12 +97,14 @@ class LocCounter:
             print(f"Debug mode enabled: Saved unencrypted repo tracker to {debug_path}")
 
     def get_latest_commit(self, repo_name):
-        branches = ["main", "master"]
-        for branch in branches:
-            url = f"https://api.github.com/repos/{self.github_username}/{repo_name}/commits/{branch}"
-            headers = {"Authorization": f"token {self.github_token}"}
-            response = requests.get(url, headers=headers)
-        return response.json().get("sha") if response.status_code == 200 else None
+        url = f"https://api.github.com/repos/{self.github_username}/{repo_name}/commits"
+        headers = {"Authorization": f"token {self.github_token}"}
+        response = requests.get(url, headers=headers, params={"per_page": 1})
+        if response.status_code == 200:
+            commits = response.json()
+            if commits:
+                return commits[0].get("sha")
+        return None
 
     def clone_repositories(self, repos, repo_tracker):
         if not os.path.exists(self.repo_dir):
