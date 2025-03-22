@@ -180,35 +180,28 @@ class LocCounter:
 
 
     def update_readme(self, total_loc):
-        print(f"Current working directory: {os.getcwd()}")  # Debug print
-        print(f"Updating README.md at path: {self.readme_path}")  # Debug print
-        if not os.path.exists(self.readme_path):
-            print(f"README.md not found at path: {self.readme_path}")  # Debug print
-            # Try adjusting the path
-            self.readme_path = os.path.join(os.getcwd(), "README.md")
-            print(f"Trying adjusted path: {self.readme_path}")  # Debug print
-            if not os.path.exists(self.readme_path):
-                print(f"README.md still not found at path: {self.readme_path}")  # Debug print
-                return
-        with open(self.readme_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        new_content = re.sub(
-            f'<!--START_SECTION:{self.section_tag}-->.*?<!--END_SECTION:{self.section_tag}-->',
-            f'<!--START_SECTION:{self.section_tag}-->\n\n'
-            f'![{self.display_title}](https://img.shields.io/badge/{self.display_title}-{total_loc}-blue)\n\n'
-            f'<!--END_SECTION:{self.section_tag}-->',
-            content, flags=re.DOTALL
-        )
-        with open(self.readme_path, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        print(f"Updated README.md with total LOC: {total_loc}")  # Debug print
+        if os.path.exists(self.readme_path):
+            with open(self.readme_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            new_content = re.sub(
+                f'<!--START_SECTION:{self.section_tag}-->.*?<!--END_SECTION:{self.section_tag}-->',
+                f'<!--START_SECTION:{self.section_tag}-->\n\n'
+                f'![{self.display_title}](https://img.shields.io/badge/{self.display_title}-{total_loc}-blue)\n\n'
+                f'<!--END_SECTION:{self.section_tag}-->',
+                content, flags=re.DOTALL
+            )
+            with open(self.readme_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print(f"Updated README.md with total LOC: {total_loc}")  # Debug print
+        else:
+            print(f"README.md not found at {self.readme_path}. Skipping update.")
+            return None
                 
     def run(self):
         repos = self.get_repositories()
         repo_tracker = self.load_repo_tracker()
         updated_repos = self.clone_repositories(repos, repo_tracker)
         total_loc = sum(repo_tracker[repo]["lines"] for repo in repo_tracker if "lines" in repo_tracker[repo])
-        
             # Add professional contribution if enabled
         if self.professional_contrib:
             work_days = self.work_experience * 261  # Approximate total work days
@@ -239,7 +232,7 @@ if __name__ == "__main__":
 
     # Repository and file settings
     parser.add_argument("--repo_dir", default="repos", help="Local directory where repositories will be cloned.")
-    parser.add_argument("--readme_path", default="readme.md", help="Path to the README file where the LOC badge will be updated.")
+    parser.add_argument("--readme_path", default="README.md", help="Path to the README file where the LOC badge will be updated.")
     parser.add_argument("--track_file", default="repo_tracker.json", help="Filename to store encrypted repository tracking data.")
     parser.add_argument("--file_extensions", default=".py,.js,.ts,.java,.cpp,.md", help="Comma-separated list of file extensions to include in LOC calculations.")
     parser.add_argument("--exclude_forked_repos", default="true", help="Exclude forked repositories from LOC calculations (true/false).")
