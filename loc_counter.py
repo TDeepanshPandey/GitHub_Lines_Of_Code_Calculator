@@ -238,7 +238,7 @@ if __name__ == "__main__":
 
     # Debugging and tracking
     parser.add_argument("--record_file_extensions", default=False, action="store_true", help="Enable tracking of unique file extensions found in repositories.")
-    parser.add_argument("--debug_tracker", default="true", help="Save an unencrypted repo_tracker.json for debugging (true/false).")
+    parser.add_argument("--debug_tracker", default=False, help="Save an unencrypted repo_tracker.json for debugging (true/false).")
 
     # Professional contribution estimation
     parser.add_argument("--professional_contrib", action="store_true", help="Include estimated professional contributions in the LOC count.")
