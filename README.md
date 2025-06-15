@@ -1,6 +1,6 @@
 <!--START_SECTION:locTag-->
 
-![From%20Hello%20World%20till%20today,%20I%20have%20written](https://img.shields.io/badge/From%20Hello%20World%20till%20today,%20I%20have%20written-105390-blue)
+![From%20Hello%20World%20till%20today,%20I%20have%20written](https://img.shields.io/badge/From%20Hello%20World%20till%20today,%20I%20have%20written-104730-blue)
 
 <!--END_SECTION:locTag-->
 
